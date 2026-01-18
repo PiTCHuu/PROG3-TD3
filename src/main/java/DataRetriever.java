@@ -131,7 +131,7 @@ public class DataRetriever {
             throws SQLException {
         if (ingredients == null || ingredients.isEmpty()) {
             try (PreparedStatement ps = conn.prepareStatement(
-                    "UPDATE ingredient SET id_dish = NULL WHERE id_dish = ?")) {
+                    "UPDATE ingredient SET id_dish = NULL, required_quantity = NULL WHERE id_dish = ?")) {
                 ps.setInt(1, dishId);
                 ps.executeUpdate();
             }
@@ -140,7 +140,7 @@ public class DataRetriever {
 
         String baseSql = """
                     UPDATE ingredient
-                    SET id_dish = NULL
+                    SET id_dish = NULL, required_quantity = NULL
                     WHERE id_dish = ? AND id NOT IN (%s)
                 """;
 
@@ -169,15 +169,20 @@ public class DataRetriever {
 
         String attachSql = """
                     UPDATE ingredient
-                    SET id_dish = ?
+                    SET id_dish = ?, required_quantity = ?
                     WHERE id = ?
                 """;
 
         try (PreparedStatement ps = conn.prepareStatement(attachSql)) {
             for (Ingredient ingredient : ingredients) {
                 ps.setInt(1, dishId);
-                ps.setInt(2, ingredient.getId());
-                ps.addBatch(); // Can be substitute ps.executeUpdate() but bad performance
+                if (ingredient.getQuantity() != null) {
+                    ps.setDouble(2, ingredient.getQuantity());
+                } else {
+                    ps.setNull(2, Types.DOUBLE);
+                }
+                ps.setInt(3, ingredient.getId());
+                ps.addBatch();
             }
             ps.executeBatch();
         }
