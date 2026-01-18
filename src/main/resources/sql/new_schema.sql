@@ -24,4 +24,3 @@ INSERT INTO dish_ingredient (id_dish, id_ingredient, quantity_required, unit) VA
 UPDATE dish SET selling_price = 3500.00 WHERE id = 1;
 UPDATE dish SET selling_price = 12000.00 WHERE id = 2;
 UPDATE dish SET selling_price = 8000.00 WHERE id = 4;
--- Les plats 3 et 5 restent avec selling_price = NULL
