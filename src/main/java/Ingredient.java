@@ -78,4 +78,7 @@ public class Ingredient {
                 ", price=" + price +
                 '}';
     }
+
+    public void setQuantityRequired(Double requiredQuantity) {
+    }
 }
