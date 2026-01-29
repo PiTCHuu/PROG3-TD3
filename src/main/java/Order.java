@@ -7,6 +7,24 @@ public class Order {
     private String reference;
     private Instant creationDatetime;
     private List<DishOrder> dishOrderList;
+    private OrderStatus status;
+    private OrderType type;
+
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+
+    public OrderType getType() {
+        return type;
+    }
+
+    public void setType(OrderType type) {
+        this.type = type;
+    }
 
     public Integer getId() {
         return id;
@@ -47,6 +65,8 @@ public class Order {
                 ", reference='" + reference + '\'' +
                 ", creationDatetime=" + creationDatetime +
                 ", dishOrderList=" + dishOrderList +
+                ", status=" + status +
+                ", type=" + type +
                 '}';
     }
 
@@ -58,15 +78,15 @@ public class Order {
         throw new RuntimeException("Not implemented");
     }
 
-
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Order order)) return false;
-        return Objects.equals(id, order.id) && Objects.equals(reference, order.reference) && Objects.equals(creationDatetime, order.creationDatetime) && Objects.equals(dishOrderList, order.dishOrderList);
+        if (o == null || getClass() != o.getClass()) return false;
+        Order order = (Order) o;
+        return Objects.equals(id, order.id) && Objects.equals(reference, order.reference) && Objects.equals(creationDatetime, order.creationDatetime) && Objects.equals(dishOrderList, order.dishOrderList) && status == order.status && type == order.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, reference, creationDatetime, dishOrderList);
+        return Objects.hash(id, reference, creationDatetime, dishOrderList, status, type);
     }
 }

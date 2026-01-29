@@ -1,25 +1,47 @@
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
 public class Main {
     public static void main(String[] args) {
         DataRetriever dataRetriever = new DataRetriever();
-        Dish saladeVerte = dataRetriever.findDishById(1);
-        System.out.println(saladeVerte);
 
-        Dish poulet = dataRetriever.findDishById(2);
-        System.out.println(poulet);
+        try {
+            System.out.println("--- ÉTAPE 1 : Création d'une nouvelle commande ---");
+            Order newOrder = new Order();
+            newOrder.setReference("CMD-" + System.currentTimeMillis());
+            newOrder.setCreationDatetime(Instant.now());
+            newOrder.setType(OrderType.TAKE_AWAY); // 1) a) Gestion du type
+            newOrder.setStatus(OrderStatus.CREATED); // 1) b) Gestion du statut
+            newOrder.setDishOrderList(new ArrayList<>()); // Liste vide pour le test
 
-        Dish rizLegume = dataRetriever.findDishById(3);
-        rizLegume.setPrice(100.0);
-        Dish newRizLegume = dataRetriever.saveDish(rizLegume);
-        System.out.println(newRizLegume); // Should not throw exception
+            Order savedOrder = dataRetriever.saveOrder(newOrder);
+            System.out.println("Commande enregistrée avec ID : " + savedOrder.getId());
+            System.out.println("Statut actuel : " + savedOrder.getStatus());
 
+            System.out.println("\n--- ÉTAPE 2 : Passage au statut READY ---");
+            savedOrder.setStatus(OrderStatus.READY);
+            dataRetriever.saveOrder(savedOrder);
+            System.out.println("Mise à jour réussie : Statut = READY");
 
-//        Dish rizLegumeAgain = dataRetriever.findDishById(3);
-//        rizLegumeAgain.setPrice(null);
-//        Dish savedNewRizLegume = dataRetriever.saveDish(rizLegume);
-//        System.out.println(savedNewRizLegume); // Should throw exception
+            System.out.println("\n--- ÉTAPE 3 : Passage au statut DELIVERED ---");
+            savedOrder.setStatus(OrderStatus.DELIVERED);
+            dataRetriever.saveOrder(savedOrder);
+            System.out.println("Commande marquée comme LIVRÉE.");
 
-        Ingredient laitue = dataRetriever.findIngredientById(1);
-        System.out.println(laitue);
+            System.out.println("\n--- ÉTAPE 4 : Tentative de modification interdite ---");
+            // On tente de changer la référence d'une commande déjà livrée
+            savedOrder.setReference("MODIF-INTERDITE");
 
+            try {
+                dataRetriever.saveOrder(savedOrder);
+                System.out.println("ERREUR : La modification aurait dû être bloquée !");
+            } catch (RuntimeException e) {
+                System.err.println("SUCCÈS : L'exception a bien été levée : " + e.getMessage());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
